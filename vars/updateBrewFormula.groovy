@@ -24,10 +24,13 @@ def call(repo, fork, credentials, formula, archive, version) {
 
                 if [ -e "${formula}.rb" ] ; then
                     File="${formula}.rb"
+                    Type="flat"
                 elif [ -e "Cask/${formula}.rb" ] ; then
                     File="Cask/${formula}.rb"
+                    Type="cask"
                 elif [ -e "Formula/${formula}.rb" ] ; then
                     File="Formula/${formula}.rb"
+                    Type="brew"
                 else
                     echo "ERROR: formula ${formula} not found in ${repo}"
                     exit
