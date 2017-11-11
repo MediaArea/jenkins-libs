@@ -36,14 +36,14 @@ def call(repo, fork, credentials, formula, archive, version) {
                     exit
                 fi
 
-                Old_Version=\$(sed -n 's/^  version .\\([0-9.]*\\).\$/\\1/p' "\${File}")
-                Old_Hash=\$(sed -n 's/^  sha256 .\\([0-9a-z]*\\).\$/\\1/p' "\${File}")
+                Old_Version=\$(sed -n 's/^  version .\\([0-9.]*\\).\$/\\1/p' "../\${File}")
+                Old_Hash=\$(sed -n 's/^  sha256 .\\([0-9a-z]*\\).\$/\\1/p' "../\${File}")
 
                 New_Version="${version}"
                 New_Hash=\$(sha256sum "${archive}" |cut -d' ' -f1)
 
-                sed -i "s/\${Old_Version//./\\\\.}/\${New_Version}/g" "\${File}"
-                sed -i "s/\${Old_Hash//./\\\\.}/\${New_Hash}/g" "\${File}"
+                sed -i "s/\${Old_Version//./\\\\.}/\${New_Version}/g" "../\${File}"
+                sed -i "s/\${Old_Hash}/\${New_Hash}/g" "../\${File}"
 
                 git commit -a -m "${formula} ${version}"
                 git push -f "https://${user}:${pass}@github.com/${fork}" "${formula}-${version}"

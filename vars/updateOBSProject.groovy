@@ -1,8 +1,16 @@
 #!/usr/bin/groovy
 
+/*
+updateOBSProject - update sources on OBS
+ arguments:
+  - project: OBS project name
+  - path: sources directory path
+  - release: release mode (true or false)
+*/
+
 def call(project, path, release) {
     sh """
-        . \${UTILS}/build_release/Config.sh
+        . ${env.UTILS}/build_release/Config.sh
 
         if [ "${release}" != "true" ] ; then
             OBS_project=\${OBS_project}:snapshots

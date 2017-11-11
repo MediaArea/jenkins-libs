@@ -14,7 +14,7 @@ def call(name, version, arch, src) {
 
     sh "lxc launch -e ubuntu:xenial/${arch} snap-${name}-${arch}-${BUILD_NUMBER}"
 
-    sleep(5)
+    sleep(10)
 
     try {
         sh """
