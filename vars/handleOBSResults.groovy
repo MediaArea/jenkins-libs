@@ -12,7 +12,7 @@ handleOBSresults - download packages from OBS
 def call(project, version, paths, release) {
     def extra_args = ""
 
-    if(release) {
+    if(release == "true") {
         extra_args = "--repo-script"
     }
 
