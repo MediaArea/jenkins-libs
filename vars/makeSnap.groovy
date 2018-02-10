@@ -10,7 +10,7 @@ makeSnap - create snapcraft package from directory
 */
 
 def call(name, version, arch, src) {
-    def snap_version = version.replaceAll('0+$', '') // snapcraft remove trailing zeros from version number
+    //def snap_version = version.replaceAll('0+$', '') // snapcraft remove trailing zeros from version number (update: seem fixed)
 
     sh "lxc launch -e ubuntu:xenial/${arch} snap-${name}-${arch}-${BUILD_NUMBER}"
 
@@ -24,7 +24,7 @@ def call(name, version, arch, src) {
             lxc file push -r ${src} snap-${name}-${arch}-${BUILD_NUMBER}/root
             lxc exec snap-${name}-${arch}-${BUILD_NUMBER} -- sh -c "cd ${src} && snapcraft"
 
-            lxc file pull snap-${name}-${arch}-${BUILD_NUMBER}/root/${src}/${name}_${snap_version}_${arch}.snap ${name}_${version}_${arch}.snap
+            lxc file pull snap-${name}-${arch}-${BUILD_NUMBER}/root/${src}/${name}_${version}_${arch}.snap ${name}_${version}_${arch}.snap
         """
     } catch(Exception e) {
         sh "lxc delete -f snap-${name}-${arch}-${BUILD_NUMBER}"
