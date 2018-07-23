@@ -19,6 +19,9 @@ def call(project, version, paths, release) {
     sh """
         . ${env.UTILS}/build_release/Config.sh
 
+        # test freight fork
+        export PATH="/home/wmedia/freight/bin:${PATH}"
+
         if [ "${release}" != "true" ] ; then
             OBS_project=\${OBS_project}:snapshots
         fi
