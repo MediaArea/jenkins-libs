@@ -50,7 +50,7 @@ def call(repo, fork, credentials, formula, archive, version) {
                     sed -i "s/\${Old_Checkpoint}/\${New_Checkpoint}/g" "\${File}"
                 fi
 
-                Old_Version=\$(sed -n 's/^  version .\\([0-9.]*\\).\$/\\1/p' "\${File}")
+                Old_Version=\$(sed -n 's/^  version .\\([0-9a-z.]*\\).\$/\\1/p' "\${File}")
                 Old_Hash=\$(sed -n 's/^  sha256 .\\([0-9a-z]*\\).\$/\\1/p' "\${File}")
 
                 sed -i "s/\${Old_Version//./\\\\.}/\${New_Version}/g" "\${File}"
