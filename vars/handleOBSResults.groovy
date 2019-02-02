@@ -7,13 +7,18 @@ handleOBSresults - download packages from OBS
   - version: version to download
   - paths: destination directories
   - release: release mode (true or false)
+  - filter: (optional) download only distributions/archs
 */
 
-def call(project, version, paths, release) {
+def call(project, version, paths, release, filter="") {
     def extra_args = ""
 
     if(release == "true") {
         extra_args = "--repo-script"
+    }
+
+    if (!filter.allWhitespace) {
+        extra_args = "--filter " + filter
     }
 
     sh """
