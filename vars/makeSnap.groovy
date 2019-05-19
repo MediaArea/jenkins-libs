@@ -19,6 +19,8 @@ def call(name, version, arch, src) {
     try {
         sh """
             lxc exec snap-${name}-${arch}-${BUILD_NUMBER} -- sh -c "echo nameserver 8.8.8.8 > /etc/resolv.conf"
+            lxc exec snap-${name}-${arch}-${BUILD_NUMBER} -- sh -c "echo nameserver 8.8.4.4 >> /etc/resolv.conf"
+            lxc exec snap-${name}-${arch}-${BUILD_NUMBER} -- sh -c "echo 91.189.88.149 security.ubuntu.com. archive.ubuntu.com. >> /etc/hosts"
             lxc exec snap-${name}-${arch}-${BUILD_NUMBER} -- apt-get update
             lxc exec snap-${name}-${arch}-${BUILD_NUMBER} -- apt-get install snapcraft -y
             lxc file push -r ${src} snap-${name}-${arch}-${BUILD_NUMBER}/root
