@@ -12,9 +12,6 @@ updateBrewFormula - update homebrew/cask formula for new version of package in f
 */
 
 def call(repo, fork, credentials, formula, archive, version) {
-    curl_agent='Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_3) AppleWebKit/602.4.8 (KHTML, like Gecko) Version/10.0.3 Safari/602.4.8'
-    curl_options='--silent --compressed --location --fail'
-
     withCredentials([usernamePassword(credentialsId: credentials, usernameVariable: 'user', passwordVariable: 'pass')]) {
         sh """
             New_Version="${version}"
@@ -40,14 +37,6 @@ def call(repo, fork, credentials, formula, archive, version) {
                 else
                     echo "ERROR: formula ${formula} not found in ${repo}"
                     exit
-                fi
-
-                if [ "\${Type}" == "cask" ] ; then
-                    Url=\$(sed -n 's/^\\s\\+appcast ['\\''"]\\([^'\\''"]\\+\\)['\\''"].*/\\1/p' "\${File}")
-                    Old_Checkpoint=\$(sed -n 's/^\\s\\+checkpoint: ['\\''"]\\([0-9a-z]*\\)['\\''"].*/\\1/p' "\${File}")
-                    New_Checkpoint=\$(curl ${curl_options} --user-agent '${curl_agent}' "\${Url}" |sed 's/<pubDate>[^<]*<\\/pubDate>//g' |shasum --algorithm 256 |cut -d' ' -f1)
-
-                    sed -i "s/\${Old_Checkpoint}/\${New_Checkpoint}/g" "\${File}"
                 fi
 
                 Old_Version=\$(sed -n 's/^  version .\\([0-9a-z.]*\\).\$/\\1/p' "\${File}")
