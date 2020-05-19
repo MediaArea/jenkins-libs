@@ -40,6 +40,10 @@ def call(file, bundle, credentials) {
 
                     status=\$(/usr/libexec/PlistBuddy -c 'Print notarization-info:Status' status.\${i}.plist 2>/dev/null || true)
 
+                    if [ -z "\${status}" ] ; then
+                        continue
+                    fi
+
                     if [ "\${status}" == "in progress" ] ; then
                         continue
                     else
