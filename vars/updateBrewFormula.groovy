@@ -12,16 +12,17 @@ updateBrewFormula - update homebrew/cask formula for new version of package in f
 */
 
 def call(repo, fork, credentials, formula, archive, version) {
-    def TMPDIR = pwd(tmp: true)
     withCredentials([usernamePassword(credentialsId: credentials, usernameVariable: 'user', passwordVariable: 'pass')]) {
         sh """
-            tmp="\$(mktemp -d -t brew 2>/dev/null)"
             New_Version="${version}"
             New_Hash=\$(sha256sum "${archive}" |cut -d' ' -f1)
 
-            git clone --depth=1 "https://github.com/${repo}" "\${tmp}"
+            dir="brew-\${RANDOM}"
+            rm -fr "\${dir}"
 
-            pushd "\${tmp}"
+            git clone --depth=1 "https://github.com/${repo}" "\${dir}"
+
+            pushd "\${dir}"
                 git checkout -b "${formula}-${version}"
 
                 if [ -e "${formula}.rb" ] ; then
@@ -49,6 +50,8 @@ def call(repo, fork, credentials, formula, archive, version) {
                 git commit -a -m "${formula} ${version}"
                 git push -f "https://${user}:${pass}@github.com/${fork}" "${formula}-${version}"
             popd
+
+            rm -fr "\${dir}"
         """
     }
 }
