@@ -12,17 +12,16 @@ updateBrewFormula - update homebrew/cask formula for new version of package in f
 */
 
 def call(repo, fork, credentials, formula, archive, version) {
+    def TMPDIR = pwd(tmp: true)
     withCredentials([usernamePassword(credentialsId: credentials, usernameVariable: 'user', passwordVariable: 'pass')]) {
         sh """
+            tmp="\$(mktemp -d -t brew 2>/dev/null)"
             New_Version="${version}"
             New_Hash=\$(sha256sum "${archive}" |cut -d' ' -f1)
 
-            dir="brew-\${RANDOM}"
-            rm -fr "\${dir}"
+            git clone --depth=1 "https://github.com/${repo}" "\${tmp}"
 
-            git clone --depth=1 "https://github.com/${repo}" "\${dir}"
-
-            pushd "\${dir}"
+            pushd "\${tmp}"
                 git checkout -b "${formula}-${version}"
 
                 if [ -e "${formula}.rb" ] ; then
@@ -42,14 +41,14 @@ def call(repo, fork, credentials, formula, archive, version) {
                 Old_Version=\$(sed -n 's/^  version .\\([0-9a-z.]*\\).\$/\\1/p' "\${File}")
                 Old_Hash=\$(sed -n 's/^  sha256 .\\([0-9a-z]*\\).\$/\\1/p' "\${File}")
 
-                sed -i "s/\${Old_Version//./\\\\.}/\${New_Version}/g" "\${File}"
+                if [ -n "$Old_Version" ] ; then
+                    sed -i "s/\${Old_Version//./\\\\.}/\${New_Version}/g" "\${File}"
+                fi
                 sed -i "s/\${Old_Hash}/\${New_Hash}/g" "\${File}"
 
                 git commit -a -m "${formula} ${version}"
                 git push -f "https://${user}:${pass}@github.com/${fork}" "${formula}-${version}"
             popd
-
-            rm -fr "\${dir}"
         """
     }
 }
