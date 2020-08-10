@@ -42,7 +42,7 @@ def call(repo, fork, credentials, formula, archive, version) {
                 Old_Version=\$(sed -n 's/^  version .\\([0-9a-z.]*\\).\$/\\1/p' "\${File}")
                 Old_Hash=\$(sed -n 's/^  sha256 .\\([0-9a-z]*\\).\$/\\1/p' "\${File}")
 
-                if [ -n "$Old_Version" ] ; then
+                if [ -n "\$Old_Version" ] ; then
                     sed -i "s/\${Old_Version//./\\\\.}/\${New_Version}/g" "\${File}"
                 fi
                 sed -i "s/\${Old_Hash}/\${New_Hash}/g" "\${File}"
