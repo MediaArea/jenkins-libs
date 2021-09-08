@@ -49,8 +49,12 @@ def call(file, bundle, credentials) {
                             if [ "${status}" != "success" ] ; then
                                 exit 1
                             fi
-                            xcrun stapler staple "${FILE}"
-                            exit 0
+                            for i in $(seq 1 15) ; do
+                                if xcrun stapler staple "${FILE}" ; then
+                                    exit 0
+                                fi
+                                sleep 1
+                            done
                         fi
                     done
                     exit 1
