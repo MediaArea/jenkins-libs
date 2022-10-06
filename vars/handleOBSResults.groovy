@@ -3,34 +3,40 @@
 /*
 handleOBSresults - download packages from OBS
  arguments:
+  - credentials: obs credentials
   - project: OBS project name
   - version: version to download
-  - paths: destination directories
-  - release: release mode (true or false)
+  - path: destination directory
+  - path: destination subdirectory
+  - release: release mode
   - filter: (optional) download only distributions/archs
 */
 
-def call(project, version, paths, release, filter="") {
+def call(credentials, project, version, path, subdir, release, filter="") {
     def extra_args = ""
 
-    if(release == "true") {
-        extra_args = "--repo-script"
-    }
-
     if (!filter.allWhitespace) {
-        extra_args = "--filter " + filter
+        extra_args += " --filter ${filter}"
     }
 
-    sh """
-        . ${env.UTILS}/build_release/Config.sh
+    if (release) {
+        extra_args += " --release"
+    }
 
-        # test freight fork
-        export PATH="/home/wmedia/freight/bin:${PATH}"
+    withCredentials([usernamePassword(credentialsId: credentials, usernameVariable: 'username', passwordVariable: 'password')]) {
+        sh '''
+            mkdir -p ~/.config/osc
+            echo "[general]" > ~/.config/osc/oscrc
+            echo "apiurl = https://api.opensuse.org" >> ~/.config/osc/oscrc
+            echo "[https://api.opensuse.org]" >> ~/.config/osc/oscrc
+            echo "user = ${username}" >> ~/.config/osc/oscrc
+            echo "pass = ${password}" >> ~/.config/osc/oscrc
+        '''
+    }
 
-        if [ "${release}" != "true" ] ; then
-            OBS_project=\${OBS_project}:snapshots
-        fi
-
-        python ${env.UTILS}/build_release/Handle_OBS_results.py ${extra_args} \${OBS_project} ${project} ${version} ${paths.join(' ')}
-    """
+    withEnv(["project_arg=${project}", "version_arg=${version}", "path_arg=${path}", "subdir_arg=${subdir}", "extra_args_arg=${extra_args}"]) {
+        sh '''
+            python3 ${UTILS}/build_release/handleOBSResults/handleOBSResults.py ${extra_args_arg} ${project_arg%/*} ${project_arg##*/} ${version_arg} ${path_arg} ${subdir_arg}
+        '''
+    }
 }
