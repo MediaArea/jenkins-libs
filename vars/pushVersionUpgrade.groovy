@@ -14,7 +14,7 @@ def call(repo, credentials, path, version) {
         sh """
             pushd "${path}"
                 git checkout -b "preparing-v${version}"
-                git commit -a -m "Preparing v${version}"
+                git commit --allow-empty -a -m "Preparing v${version}"
                 git push -f "https://${user}:${pass}@github.com/${repo}" "preparing-v${version}"
             popd
         """
