@@ -7,20 +7,28 @@ winSignExecutable - sign windows PE executable
   - name: signature object
 */
 
+import groovy.transform.Field
+import java.util.concurrent.atomic.AtomicInteger
+
+@Field static AtomicInteger counter = new AtomicInteger(0)
+
 def call(path, name) {
     def file = new File(path).name
-    echo(file)
+    def id = counter.incrementAndGet()
+
+    echo("Signing ${file} with subject ${name}...")
+
     dir(new File(path).parent) {
-        stash(name: file, includes: file)
+        stash(name: "codesign-input-${id}", includes: file)
         node('codesign') {
             deleteDir()
-            unstash(file)
+            unstash("codesign-input-${id}")
             withEnv(["FILE=${file}", "NAME=${name}"]) {
                 sh '$HOME/.codesign "${NAME}" "${FILE}" ${FILE}.signed'
             }
-            stash(name: "${file}.signed", includes: "${file}.signed")
+            stash(name: "codesign-output-${id}", includes: "${file}.signed")
         }
-        unstash("${file}.signed")
+        unstash("codesign-output-${id}")
         withEnv(["FILE=${file}"]) {
             powershell '''
                 Remove-Item -Force -Path "${Env:FILE}"
