@@ -24,7 +24,7 @@ def call(path, name) {
             deleteDir()
             unstash("codesign-input-${id}")
             withEnv(["FILE=${file}", "NAME=${name}"]) {
-                sh '$HOME/.codesign "${NAME}" "${FILE}" ${FILE}.signed'
+                sh '$HOME/.codesign "${NAME}" "${FILE}" "${FILE}.signed"'
             }
             stash(name: "codesign-output-${id}", includes: "${file}.signed")
         }
