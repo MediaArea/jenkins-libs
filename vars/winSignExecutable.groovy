@@ -13,12 +13,13 @@ import java.util.concurrent.atomic.AtomicInteger
 @Field static AtomicInteger counter = new AtomicInteger(0)
 
 def call(path, name) {
+    def parent = new File(path).parent ?: '.'
     def file = new File(path).name
     def id = counter.incrementAndGet()
 
     echo("Signing ${file} with subject ${name}...")
 
-    dir(new File(path).parent) {
+    dir(parent) {
         stash(name: "codesign-input-${id}", includes: file)
         node('codesign') {
             deleteDir()
